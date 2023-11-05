@@ -1,4 +1,32 @@
-import Image from 'next/image'
+"use client";
+import React, { useEffect } from "react";
+
+import { useHotels } from "@/contexts";
+
+const Home = (): JSX.Element => {
+  const { state, dispatch } = useHotels();
+  /* useEffect(() => {
+    console.log(state.data.slice(0, 1));
+    console.log(state.loading);
+  }, [state]); */
+  return (
+    <>
+      {state.loading && <p>loading</p>}
+      {!state.loading && state.error && <p>error</p>}
+      <p
+        onClick={() => {
+          dispatch({ type: "start-refresh" });
+        }}
+      >
+        test
+      </p>
+    </>
+  );
+};
+
+export default Home;
+
+/* import Image from 'next/image'
 import styles from './page.module.css'
 
 export default function Home() {
@@ -92,4 +120,4 @@ export default function Home() {
       </div>
     </main>
   )
-}
+} */
