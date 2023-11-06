@@ -8,7 +8,7 @@ const create = () => {
       { next: { tags: ["hotels_collection"] } }
     );
 
-    if (res.ok) {
+    if (!res.ok) {
       throw new Error("Failed to fetch data");
     }
 

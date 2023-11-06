@@ -1,26 +1,15 @@
-"use client";
-import React, { useEffect } from "react";
+import React from "react";
+import { Box, Container, Stack } from "@mui/material";
 
-import { useHotels } from "@/contexts";
+import { HotelsDataTable } from "@/components";
 
 const Home = (): JSX.Element => {
-  const { state, dispatch } = useHotels();
-  /* useEffect(() => {
-    console.log(state.data.slice(0, 1));
-    console.log(state.loading);
-  }, [state]); */
   return (
-    <>
-      {state.loading && <p>loading</p>}
-      {!state.loading && state.error && <p>error</p>}
-      <p
-        onClick={() => {
-          dispatch({ type: "start-refresh" });
-        }}
-      >
-        test
-      </p>
-    </>
+    <main>
+      <Stack spacing={2} padding={"20px"}>
+        <HotelsDataTable />
+      </Stack>
+    </main>
   );
 };
 

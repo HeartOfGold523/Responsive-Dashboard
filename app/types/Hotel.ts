@@ -1,22 +1,22 @@
 export interface Hotel {
-  parid: string; // '1000100033'
-  borocode: string; // '1'
-  block: string; // '10'
-  lot: string; // '33'
-  taxyear: string; // '2021'
-  street_num: string; // '8'
-  street_name: string; // 'STONE STREET'
-  postcode: string; // '10004'
-  bldg_class: string; // 'H2'
-  taxclass: string; // '4'
-  owner_name: string; // 'B.H. 8 STONE STREET AG, LLC'
-  borough: string; // 'MANHATTAN'
-  latitude: string; // '40.704025'
-  longitude: string; // '-74.012638'
-  community_board: string; // '101'
-  council_district: string; // '1'
-  census_tract: string; // '9'
-  bin: string; // '1087618'
-  bbl: string; // '1000100033'
-  nta: string; // 'Battery Park City-Lower Manhattan'
+  parid: number;
+  borocode: number;
+  block: number;
+  lot: number;
+  taxyear: number;
+  street_num: string;
+  street_name: string;
+  postcode: string;
+  bldg_class: string;
+  taxclass: number;
+  owner_name: string;
+  borough: string;
+  latitude: number;
+  longitude: number;
+  community_board: number;
+  council_district: string;
+  census_tract: number;
+  bin: number;
+  bbl: number;
+  nta: string;
 }

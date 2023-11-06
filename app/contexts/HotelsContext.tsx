@@ -3,7 +3,13 @@ import React, { createContext, useContext, useEffect, useReducer } from "react";
 
 import { Hotel } from "@/types";
 
-type Action = { type: "start-refresh" | "stop-refresh" };
+type Action =
+  | { type: "refresh" }
+  | { type: "stop-refresh" }
+  | {
+      type: "new-data";
+      payload: { collection: Hotel[]; error: boolean };
+    };
 type Dispatch = (action: Action) => void;
 type ContextValue = {
   state: ContextProviderState;
@@ -32,14 +38,18 @@ const testReducer = (
   action: Action
 ): ContextProviderState => {
   switch (action.type) {
-    case "start-refresh": {
+    case "refresh": {
       return { ...state, refresh: true, loading: true };
     }
     case "stop-refresh": {
       return { ...state, refresh: false, loading: false };
     }
+    case "new-data": {
+      const { collection, error } = action.payload;
+      return { ...state, data: collection, error: error };
+    }
     default: {
-      throw new Error(`Unhandled action type: ${action.type}`);
+      throw new Error("Unhandled action type");
     }
   }
 };
@@ -56,6 +66,10 @@ const HotelsContextProvider = ({
     loading: false,
     error: error,
   });
+
+  useEffect(() => {
+    dispatch({ type: "new-data", payload: { collection, error } });
+  }, [collection, error]);
 
   useEffect(() => {
     if (state.refresh) {

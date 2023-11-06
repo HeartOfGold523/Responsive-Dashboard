@@ -11,7 +11,6 @@ type HotelCollectionPromise = {
 
 export const fetchHotelCollection =
   async (): Promise<HotelCollectionPromise> => {
-    console.log("got here");
     try {
       const data = await hotelsApi.getData();
       return { data: data, error: false };
