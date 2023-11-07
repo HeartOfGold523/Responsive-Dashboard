@@ -1,13 +1,24 @@
 import React from "react";
 import { Box, Container, Stack } from "@mui/material";
 
-import { HotelsDataTable } from "@/components";
+import {
+  DataPieChart,
+  HotelsDataTable,
+  HotelsPostCodePieChart,
+} from "@/components";
 
 const Home = (): JSX.Element => {
   return (
     <main>
-      <Stack spacing={2} padding={"20px"}>
-        <HotelsDataTable />
+      <Stack spacing={2} padding={2}>
+        <Box display={"flex"} flexDirection={{ xs: "column", md: "row" }}>
+          <HotelsPostCodePieChart />
+          <DataPieChart />
+        </Box>
+        {/* <HotelsPostCodePieChart /> */}
+        <Box>
+          <HotelsDataTable />
+        </Box>
       </Stack>
     </main>
   );

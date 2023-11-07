@@ -1,29 +1,23 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import {
   Box,
-  FormControlLabel,
+  Collapse,
   IconButton,
   Paper,
-  Switch,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableFooter,
-  TableHead,
-  TablePagination,
   TableRow,
-  TableSortLabel,
+  Tooltip,
 } from "@mui/material";
-import {
-  FirstPage,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  LastPage,
-} from "@mui/icons-material";
-import { visuallyHidden } from "@mui/utils";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
 
+import { default as DataTableControls } from "./DataTableControls";
+import { default as DataTableHead } from "./DataTableHead";
+import { default as DataTableToolbar } from "./DataTableToolbar";
 import {
   DataTableColumn,
   DataTableColumnOrder,
@@ -31,179 +25,61 @@ import {
 } from "@/types";
 import { getComparator, stableSort } from "@/utils";
 
-type DataTableHeadProps<T> = {
-  columns: Array<DataTableColumn<T>>;
-  onRequestSort: (
-    event: React.MouseEvent<HTMLSpanElement>,
-    property: keyof T
-  ) => void;
-  order: DataTableColumnOrder;
-  orderBy?: keyof T;
-};
-
-const DataTableHead = <T,>({
-  columns,
-  onRequestSort,
-  order,
-  orderBy,
-}: DataTableHeadProps<T>): JSX.Element => {
-  const createSortHandler =
-    (property: keyof T) => (event: React.MouseEvent<HTMLSpanElement>) => {
-      onRequestSort(event, property);
-    };
-
-  return (
-    <TableHead>
-      <TableRow>
-        {columns.map((col, index) => (
-          <TableCell
-            key={`head-${String(col.id)}-${index}`}
-            align={col.numeric ? "right" : "left"}
-            padding={col.disabledPadding ? "none" : "normal"}
-            sortDirection={orderBy && orderBy === col.id ? order : false}
-          >
-            <TableSortLabel
-              active={orderBy && orderBy === col.id}
-              direction={orderBy && orderBy === col.id ? order : "asc"}
-              onClick={createSortHandler(col.id)}
-            >
-              {col.label}
-              {orderBy && orderBy === col.id ? (
-                <Box component="span" sx={visuallyHidden}>
-                  {order === "desc" ? "sorted descending" : "sorted ascending"}
-                </Box>
-              ) : null}
-            </TableSortLabel>
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-};
-
-type TablePaginationActionsProps = {
-  count: number;
-  rowsPerPage: number;
-  page: number;
-  onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
-    newPage: number
-  ) => void;
-};
-
-const TablePaginationActions = (
-  props: TablePaginationActionsProps
-): JSX.Element => {
-  const { count, page, rowsPerPage, onPageChange } = props;
-
-  const handleFirstPageButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    onPageChange(event, 0);
-  };
-
-  const handleBackButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    onPageChange(event, page - 1);
-  };
-
-  const handleNextButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    onPageChange(event, page + 1);
-  };
-
-  const handleLastPageButtonClick = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ) => {
-    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-  };
-
-  return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton
-        onClick={handleFirstPageButtonClick}
-        disabled={page === 0}
-        aria-label="first page"
-      >
-        <FirstPage />
-      </IconButton>
-      <IconButton
-        onClick={handleBackButtonClick}
-        disabled={page === 0}
-        aria-label="previous page"
-      >
-        <KeyboardArrowLeft />
-      </IconButton>
-      <IconButton
-        onClick={handleNextButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="next page"
-      >
-        <KeyboardArrowRight />
-      </IconButton>
-      <IconButton
-        onClick={handleLastPageButtonClick}
-        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-        aria-label="last page"
-      >
-        <LastPage />
-      </IconButton>
-    </Box>
-  );
-};
-
-type DataTableFooterProps = {
-  rowsPerPageOptions: DataTableRowsOptions[];
-  count: number;
-  rowsPerPage: number;
-  page: number;
-  onPageChange: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
-    newPage: number
-  ) => void;
-  onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-};
-
-const DataTableFooter = (props: DataTableFooterProps): JSX.Element => {
-  return (
-    <TableFooter>
-      <TableRow>
-        <TablePagination
-          {...props}
-          SelectProps={{
-            inputProps: {
-              "aria-label": "rows per page",
-            },
-            native: true,
-          }}
-          ActionsComponent={TablePaginationActions}
-        />
-      </TableRow>
-    </TableFooter>
-  );
-};
-
 type DataTableProps<T> = {
+  tableTitle: string;
   columns: Array<DataTableColumn<T>>;
   data: Array<T>;
   rowId: keyof T;
+  rowsPerPageOptions: DataTableRowsOptions[];
   defaultOrderBy?: keyof T;
+  collapsible?: boolean;
+  filterable?: boolean;
 };
 
 const DataTable = <T,>({
+  tableTitle,
   columns,
   data,
   rowId,
+  rowsPerPageOptions,
   defaultOrderBy,
+  collapsible,
+  filterable,
 }: DataTableProps<T>): JSX.Element => {
+  const [controlledColumns, setControlledColumns] =
+    useState<Array<DataTableColumn<T>>>(columns);
+  const [filteredData, setFilteredData] = useState<Array<T>>(data);
   const [order, setOrder] = useState<DataTableColumnOrder>("asc");
   const [orderBy, setOrderBy] = useState<keyof T | undefined>(defaultOrderBy);
-  // const [selected, setSelected] = useState<readonly number[]>([]);
+  const [opened, setOpened] = useState<readonly string[]>([]);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(() =>
+    typeof rowsPerPageOptions[0] === "object"
+      ? rowsPerPageOptions[0].value
+      : rowsPerPageOptions[0]
+  );
+
+  const handleApplyFilter = (
+    property: keyof T | undefined,
+    searchedValue: string
+  ) => {
+    if (property === undefined) {
+      setFilteredData(data);
+      return;
+    }
+
+    const newFilteredData = data.filter((item) => {
+      const val = item[property];
+      if (typeof val === "string") {
+        return val.toLowerCase().includes(searchedValue.toLowerCase());
+      } else if (typeof val === "number") {
+        return val === parseInt(searchedValue, 10);
+      }
+      return true;
+    });
+    setFilteredData(newFilteredData);
+  };
 
   const handleRequestSort = (
     event: React.MouseEvent<HTMLSpanElement>,
@@ -212,6 +88,28 @@ const DataTable = <T,>({
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
+  };
+
+  const handleClick = (
+    event: React.MouseEvent<HTMLTableRowElement, MouseEvent>,
+    id: string
+  ) => {
+    const openedIndex = opened.indexOf(id);
+    let newOpened: readonly string[] = [];
+
+    if (openedIndex === -1) {
+      newOpened = newOpened.concat(opened, id);
+    } else if (openedIndex === 0) {
+      newOpened = newOpened.concat(opened.slice(1));
+    } else if (openedIndex === opened.length - 1) {
+      newOpened = newOpened.concat(opened.slice(0, -1));
+    } else if (openedIndex > 0) {
+      newOpened = newOpened.concat(
+        opened.slice(0, openedIndex),
+        opened.slice(openedIndex + 1)
+      );
+    }
+    setOpened(newOpened);
   };
 
   const handleChangePage = (
@@ -230,50 +128,131 @@ const DataTable = <T,>({
 
   const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDense(event.target.checked);
+    setControlledColumns(
+      event.target.checked
+        ? columns.map((col) => ({
+            ...col,
+            disabledPadding: true,
+          }))
+        : columns
+    );
   };
+
+  const isOpened = (id: string) => opened.indexOf(id) !== -1;
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
 
   const visibleRows = useMemo(
     () =>
-      stableSort<T>(data, getComparator<T>(order, orderBy)).slice(
+      stableSort<T>(filteredData, getComparator<T>(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [data, order, orderBy, page, rowsPerPage]
+    [filteredData, order, orderBy, page, rowsPerPage]
   );
 
   return (
     <Box>
       <Paper sx={styles.paper}>
+        <DataTableToolbar
+          tableTitle={tableTitle}
+          columns={controlledColumns}
+          filterable={filterable}
+          handleApplyFilter={handleApplyFilter}
+        />
         <TableContainer>
-          <Table size={dense ? "small" : "medium"}>
+          <Table
+            size={dense ? "small" : "medium"}
+            aria-labelledby="data-table-title"
+          >
             <DataTableHead
-              columns={columns}
+              columns={controlledColumns}
               onRequestSort={handleRequestSort}
               order={order}
               orderBy={orderBy}
+              collapsible={collapsible}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
+                const isItemOpened = isOpened(String(row[rowId]));
+
                 return (
-                  <TableRow
-                    key={`row-${String(rowId)}-${index}`}
-                    hover
-                    tabIndex={-1}
-                    sx={styles.tableRow}
-                  >
-                    {columns.map((col, colIndex) => (
-                      <TableCell
-                        key={`cell-${String(rowId)}-${index}-${colIndex}`}
-                        align={col.numeric ? "right" : "left"}
-                      >
-                        {row[col.id] as React.ReactNode}
-                      </TableCell>
-                    ))}
-                  </TableRow>
+                  <Fragment key={`row-${String(rowId)}-${index}`}>
+                    <TableRow
+                      hover
+                      onClick={
+                        collapsible
+                          ? (event) => handleClick(event, String(row[rowId]))
+                          : undefined
+                      }
+                      tabIndex={-1}
+                      sx={styles.tableRow}
+                    >
+                      {collapsible && (
+                        <TableCell padding="checkbox">
+                          <IconButton aria-label="expand row" size="small">
+                            {isItemOpened ? (
+                              <KeyboardArrowUp />
+                            ) : (
+                              <KeyboardArrowDown />
+                            )}
+                          </IconButton>
+                        </TableCell>
+                      )}
+                      {controlledColumns.map((col, colIndex) => (
+                        <Tooltip
+                          key={`cell-${String(rowId)}-${index}-${colIndex}`}
+                          title={String(row[col.id])}
+                        >
+                          <TableCell
+                            align={col.align}
+                            component={colIndex === 0 ? "th" : undefined}
+                            scope={colIndex === 0 ? "row" : undefined}
+                            sx={{
+                              ...styles.tableCell,
+                              ...(col.disabledPadding && { p: 0 }),
+                              ...(col.maxWidth && {
+                                maxWidth: `${col.maxWidth}px`,
+                              }),
+                            }}
+                          >
+                            {row[col.id] as React.ReactNode}
+                          </TableCell>
+                        </Tooltip>
+                      ))}
+                    </TableRow>
+                    {collapsible && (
+                      <TableRow>
+                        <TableCell
+                          colSpan={controlledColumns.length + 1}
+                          sx={
+                            isItemOpened
+                              ? styles.collapsibleCellOpened
+                              : styles.collapsibleCellClosed
+                          }
+                        >
+                          <Collapse
+                            in={isItemOpened}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            {controlledColumns.map((col, colIndex) => (
+                              <Box
+                                key={`collapse-${String(
+                                  rowId
+                                )}-${index}-${colIndex}`}
+                              >
+                                {col.label}: &ensp;{" "}
+                                {row[col.id] as React.ReactNode}
+                              </Box>
+                            ))}
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </Fragment>
                 );
               })}
               {emptyRows > 0 && (
@@ -282,24 +261,28 @@ const DataTable = <T,>({
                     height: dense ? 33 : 53 * emptyRows,
                   }}
                 >
-                  <TableCell sx={styles.emptyCell} />
+                  <TableCell
+                    colSpan={
+                      collapsible
+                        ? controlledColumns.length + 1
+                        : controlledColumns.length
+                    }
+                  />
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </TableContainer>
-        <DataTableFooter
-          rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-          count={data.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
+      <DataTableControls
+        rowsPerPageOptions={rowsPerPageOptions}
+        count={filteredData.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+        dense={dense}
+        onChangeDense={handleChangeDense}
       />
     </Box>
   );
@@ -312,9 +295,15 @@ const styles = {
   tableRow: {
     cursor: "pointer",
   },
-  emptyCell: {
-    borderBottom: "none",
+  tableCell: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
+  collapsibleCellClosed: {
+    p: 0,
+  },
+  collapsibleCellOpened: {},
 };
 
 export default DataTable;
