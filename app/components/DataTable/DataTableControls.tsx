@@ -54,7 +54,7 @@ const TablePaginationActions = (
   };
 
   return (
-    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+    <Box sx={styles.tablePaginationActions}>
       <IconButton
         onClick={handleFirstPageButtonClick}
         disabled={page === 0}
@@ -105,12 +105,7 @@ const DataTableControls = (props: DataTableControlsProps): JSX.Element => {
   const { dense, onChangeDense, ...rest } = props;
 
   return (
-    <Box
-      display={"flex"}
-      flexDirection={{ xs: "column", md: "row" }}
-      justifyContent={"space-between"}
-      alignItems={{ xs: "flex-start", md: "center" }}
-    >
+    <Box sx={styles.dataTableControls}>
       <FormControlLabel
         control={<Switch checked={dense} onChange={onChangeDense} />}
         label="Dense padding"
@@ -130,6 +125,18 @@ const DataTableControls = (props: DataTableControlsProps): JSX.Element => {
   );
 };
 
-const styles = {};
+const styles = {
+  dataTableControls: {
+    display: "flex",
+    flexDirection: { xs: "column", md: "row" },
+    justifyContent: "space-between",
+    alignItems: { xs: "flex-start", md: "center" },
+    paddingLeft: 2,
+  },
+  tablePaginationActions: {
+    flexShrink: 0,
+    ml: 2.5,
+  },
+};
 
 export default DataTableControls;

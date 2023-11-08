@@ -2,6 +2,7 @@
 export * from "./DataTable";
 
 // file exports
-export { default as DataPieChart } from "./DataPieChart";
+export { default as DataChart } from "./DataChart";
+export { default as HotelsBarChart } from "./HotelsBarChart";
 export { default as HotelsDataTable } from "./HotelsDataTable";
-export { default as HotelsPostCodePieChart } from "./HotelsPostCodePieChart";
+export { default as HotelsPieChart } from "./HotelsPieChart";

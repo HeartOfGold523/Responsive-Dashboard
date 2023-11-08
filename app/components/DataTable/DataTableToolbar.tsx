@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -11,6 +11,7 @@ import {
   Toolbar,
   Tooltip,
   Typography,
+  styled,
 } from "@mui/material";
 import Close from "@mui/icons-material/Close";
 import FilterList from "@mui/icons-material/FilterList";
@@ -19,6 +20,12 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 
 import { DataTableColumn } from "@/types";
 
+const ColumnSelectedMenuForm = styled("form")(({ theme }) => ({
+  display: "flex",
+  flexDirection: "column",
+  gap: theme.spacing(2),
+}));
+
 type ColumnSelectedMenuProps = {
   label: string;
   searchInputValue: string;
@@ -26,7 +33,7 @@ type ColumnSelectedMenuProps = {
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
   handleBackToMenu: () => void;
-  handleSubmitSearch: () => void;
+  handleSubmitSearch: (event: React.FormEvent) => void;
 };
 
 const ColumnSelectedMenu = ({
@@ -38,27 +45,37 @@ const ColumnSelectedMenu = ({
 }: ColumnSelectedMenuProps): JSX.Element => {
   return (
     <Stack spacing={2} paddingX={1}>
-      <Box display={"flex"} flexDirection={"row"} alignItems={"center"}>
+      <Box sx={styles.flexRow}>
         <Tooltip title={"Back"}>
-          <IconButton onClick={handleBackToMenu} sx={{ pl: 0 }}>
+          <IconButton
+            onClick={handleBackToMenu}
+            sx={styles.columnSelectedMenuIconBtn}
+          >
             <KeyboardArrowLeft />
           </IconButton>
         </Tooltip>
         <Typography variant="h6">{label}</Typography>
       </Box>
-      <TextField
-        label={`Search ${label}`}
-        value={searchInputValue}
-        variant={"standard"}
-        onChange={handleSearchInputChange}
-      />
-      <Button
-        variant="outlined"
-        disabled={searchInputValue === ""}
-        onClick={handleSubmitSearch}
+      <ColumnSelectedMenuForm
+        onSubmit={(e) => {
+          handleSubmitSearch(e);
+          return false;
+        }}
       >
-        Search
-      </Button>
+        <TextField
+          label={`Search ${label}`}
+          value={searchInputValue}
+          variant={"standard"}
+          onChange={handleSearchInputChange}
+        />
+        <Button
+          type={"submit"}
+          variant="outlined"
+          disabled={searchInputValue === ""}
+        >
+          Search
+        </Button>
+      </ColumnSelectedMenuForm>
     </Stack>
   );
 };
@@ -94,6 +111,7 @@ type DataTableToolbarProps<T> = {
     property: keyof T | undefined,
     searchedValue: string
   ) => void;
+  contextSearchKeyValue?: { searchedKey: keyof T; searchedValue: string };
 };
 
 const DataTableToolbar = <T,>({
@@ -101,11 +119,19 @@ const DataTableToolbar = <T,>({
   columns,
   filterable,
   handleApplyFilter,
+  contextSearchKeyValue,
 }: DataTableToolbarProps<T>): JSX.Element => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [currentColumn, setCurrentColumn] = useState<keyof T>();
   const [searchValue, setSearchValue] = useState("");
-  const [showClearFilters, setShowClearFilters] = useState(false);
+
+  useEffect(() => {
+    if (contextSearchKeyValue === undefined) return;
+    if (contextSearchKeyValue.searchedValue === "") return;
+
+    setCurrentColumn(contextSearchKeyValue.searchedKey);
+    setSearchValue(contextSearchKeyValue.searchedValue);
+  }, [contextSearchKeyValue]);
 
   const open = Boolean(anchorEl);
 
@@ -119,7 +145,6 @@ const DataTableToolbar = <T,>({
 
   const handleBackToMenu = () => {
     setSearchValue("");
-    setShowClearFilters(false);
     handleApplyFilter(undefined, "");
     setCurrentColumn(undefined);
   };
@@ -134,29 +159,24 @@ const DataTableToolbar = <T,>({
     setSearchValue(event.target.value);
   };
 
-  const handleSubmitSearch = () => {
-    setShowClearFilters(true);
+  const handleSubmitSearch = (event: React.FormEvent) => {
+    event.preventDefault();
     handleApplyFilter(currentColumn, searchValue);
   };
 
   return (
-    <Toolbar>
+    <Toolbar sx={styles.toolbar}>
       <Typography
         id="data-table-title"
         variant="h6"
         component="div"
-        sx={{ flex: "1 1 100%" }}
+        sx={styles.toolbarTitle}
       >
         {tableTitle}
       </Typography>
       {filterable && (
-        <Box
-          display={"flex"}
-          flexDirection={"row"}
-          alignItems={"center"}
-          gap={1}
-        >
-          {showClearFilters && (
+        <Box sx={{ ...styles.flexRow, gap: 1 }}>
+          {contextSearchKeyValue?.searchedValue && (
             <Tooltip title={"Clear Filter"}>
               <IconButton onClick={handleBackToMenu}>
                 <Close />
@@ -202,6 +222,23 @@ const DataTableToolbar = <T,>({
       )}
     </Toolbar>
   );
+};
+
+const styles = {
+  flexRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  columnSelectedMenuIconBtn: {
+    pl: 0,
+  },
+  toolbar: {
+    gap: 1,
+  },
+  toolbarTitle: {
+    flex: "1 1 100%",
+  },
 };
 
 export default DataTableToolbar;

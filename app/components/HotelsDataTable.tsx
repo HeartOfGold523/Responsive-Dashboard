@@ -58,25 +58,7 @@ const getColumnLabel = (key: keyof Hotel): string => {
 const getColumns = (): DataTableColumn<Hotel>[] => {
   const columns = keys.map((key): DataTableColumn<Hotel> => {
     switch (key) {
-      case "borocode":
-      case "block":
-      case "lot":
-      case "taxyear":
-      case "taxclass":
-      case "latitude":
-      case "longitude":
-      case "community_board":
-      case "council_district":
-      case "census_tract":
-      case "bin":
-      case "bbl":
-        return {
-          id: key,
-          align: "right",
-          maxWidth: 50,
-          disabledPadding: false,
-          label: getColumnLabel(key),
-        };
+      // can customize different columns here
       default:
         return {
           id: key,
@@ -92,13 +74,27 @@ const getColumns = (): DataTableColumn<Hotel>[] => {
 
 const HotelsDataTable = (): JSX.Element => {
   const {
-    state: { data, loading, error },
+    state: { data, loading, error, searchedKey, searchedValue },
+    dispatch,
   } = useHotels();
+
+  const dispatchFilter = (
+    property: keyof Hotel | undefined,
+    searchedValue: string
+  ) => {
+    dispatch({ type: "filter-data", payload: { property, searchedValue } });
+  };
+
+  const tableTitle =
+    searchedValue === ""
+      ? "NYC Hotels"
+      : `NYC Hotels filtered by ${String(searchedKey).toLocaleUpperCase()}`;
+
   const columns = getColumns();
 
   return (
     <DataTable
-      tableTitle={"NYC Hotels"}
+      tableTitle={tableTitle}
       data={data}
       columns={columns}
       rowId={"parid"}
@@ -106,6 +102,8 @@ const HotelsDataTable = (): JSX.Element => {
       defaultOrderBy={"borocode"}
       collapsible
       filterable
+      dispatchFilter={dispatchFilter}
+      contextSearchKeyValue={{ searchedKey, searchedValue }}
     />
   );
 };

@@ -34,6 +34,11 @@ type DataTableProps<T> = {
   defaultOrderBy?: keyof T;
   collapsible?: boolean;
   filterable?: boolean;
+  dispatchFilter: (
+    property: keyof T | undefined,
+    searchedValue: string
+  ) => void;
+  contextSearchKeyValue?: { searchedKey: keyof T; searchedValue: string };
 };
 
 const DataTable = <T,>({
@@ -45,10 +50,11 @@ const DataTable = <T,>({
   defaultOrderBy,
   collapsible,
   filterable,
+  dispatchFilter,
+  contextSearchKeyValue,
 }: DataTableProps<T>): JSX.Element => {
   const [controlledColumns, setControlledColumns] =
     useState<Array<DataTableColumn<T>>>(columns);
-  const [filteredData, setFilteredData] = useState<Array<T>>(data);
   const [order, setOrder] = useState<DataTableColumnOrder>("asc");
   const [orderBy, setOrderBy] = useState<keyof T | undefined>(defaultOrderBy);
   const [opened, setOpened] = useState<readonly string[]>([]);
@@ -59,27 +65,6 @@ const DataTable = <T,>({
       ? rowsPerPageOptions[0].value
       : rowsPerPageOptions[0]
   );
-
-  const handleApplyFilter = (
-    property: keyof T | undefined,
-    searchedValue: string
-  ) => {
-    if (property === undefined) {
-      setFilteredData(data);
-      return;
-    }
-
-    const newFilteredData = data.filter((item) => {
-      const val = item[property];
-      if (typeof val === "string") {
-        return val.toLowerCase().includes(searchedValue.toLowerCase());
-      } else if (typeof val === "number") {
-        return val === parseInt(searchedValue, 10);
-      }
-      return true;
-    });
-    setFilteredData(newFilteredData);
-  };
 
   const handleRequestSort = (
     event: React.MouseEvent<HTMLSpanElement>,
@@ -142,25 +127,26 @@ const DataTable = <T,>({
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - filteredData.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - data.length) : 0;
 
   const visibleRows = useMemo(
     () =>
-      stableSort<T>(filteredData, getComparator<T>(order, orderBy)).slice(
+      stableSort<T>(data, getComparator<T>(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
       ),
-    [filteredData, order, orderBy, page, rowsPerPage]
+    [data, order, orderBy, page, rowsPerPage]
   );
 
   return (
-    <Box>
+    <Box component={Paper} sx={styles.box}>
       <Paper sx={styles.paper}>
         <DataTableToolbar
           tableTitle={tableTitle}
           columns={controlledColumns}
           filterable={filterable}
-          handleApplyFilter={handleApplyFilter}
+          handleApplyFilter={dispatchFilter}
+          contextSearchKeyValue={contextSearchKeyValue}
         />
         <TableContainer>
           <Table
@@ -276,7 +262,7 @@ const DataTable = <T,>({
       </Paper>
       <DataTableControls
         rowsPerPageOptions={rowsPerPageOptions}
-        count={filteredData.length}
+        count={data.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}
@@ -289,8 +275,12 @@ const DataTable = <T,>({
 };
 
 const styles = {
+  box: {
+    bgcolor: "rgba(255, 255, 255, 0.6)",
+  },
   paper: {
     mb: 2,
+    bgcolor: "inherit",
   },
   tableRow: {
     cursor: "pointer",
