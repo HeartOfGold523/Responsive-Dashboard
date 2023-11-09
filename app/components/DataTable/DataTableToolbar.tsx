@@ -54,7 +54,7 @@ const ColumnSelectedMenu = ({
             <KeyboardArrowLeft />
           </IconButton>
         </Tooltip>
-        <Typography variant="h6">{label}</Typography>
+        <Typography variant={"body1"}>{label}</Typography>
       </Box>
       <ColumnSelectedMenuForm
         onSubmit={(e) => {
@@ -73,7 +73,7 @@ const ColumnSelectedMenu = ({
           variant="outlined"
           disabled={searchInputValue === ""}
         >
-          Search
+          {"Search"}
         </Button>
       </ColumnSelectedMenuForm>
     </Stack>
@@ -96,7 +96,8 @@ const ColumnListMenu = <T,>({
           key={`filter-${String(col.id)}-${colIndex}`}
           onClick={() => handleSelectColumn(col.id)}
         >
-          {col.label} <KeyboardArrowRight />
+          <Typography variant={"caption"}>{col.label}</Typography>{" "}
+          <KeyboardArrowRight />
         </MenuItem>
       ))}
     </Stack>

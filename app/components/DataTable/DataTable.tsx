@@ -248,8 +248,10 @@ const DataTable = <T,>({
                                   <Box
                                     key={`collapse-${constructedId}-${index}-${colIndex}`}
                                   >
-                                    {col.label}: &ensp;{" "}
-                                    {row[col.id] as React.ReactNode}
+                                    <Typography variant={"caption"}>
+                                      {col.label}: &ensp;
+                                      {row[col.id] as React.ReactNode}
+                                    </Typography>
                                   </Box>
                                 ))}
                               </Collapse>
