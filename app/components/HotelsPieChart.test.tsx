@@ -1,15 +1,15 @@
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
-
-import { HotelsPieChart } from "@/components";
-import { HotelsContextProvider, useHotels } from "@/contexts";
-import { DataChartProps, Hotel, PieChartProps } from "@/types";
-import { generateHotelCollection } from "@/utils";
 import {
   DefaultizedPieValueType,
   PieChart,
   PieItemIdentifier,
 } from "@mui/x-charts";
+
+import { HotelsPieChart } from "@/components";
+import { HotelsContextProvider, useHotels } from "@/contexts";
+import { DataChartProps, PieChartProps } from "@/types";
+import { generateHotelCollection } from "@/utils";
 
 jest.mock("@mui/x-charts", () => ({
   BarChart: jest.fn(() => null),
@@ -121,7 +121,7 @@ describe("HotelsPieChart", () => {
     const { getByTestId } = renderHotelsPieChart();
     const chartTitle = getByTestId("hotels-pie-chart-title");
     expect(chartTitle).toBeDefined();
-    expect(chartTitle.textContent).toBe("NYC Hotels by NTA");
+    expect(chartTitle.textContent).toBe("Hotels by NTA");
   });
 
   it("toggles between different chart types", () => {
@@ -140,9 +140,9 @@ describe("HotelsPieChart", () => {
     const chartToggleGroup = getByTestId("hotels-pie-chart-toggle-group");
     const toggleButtons = chartToggleGroup.querySelectorAll("button");
 
-    expect(chartTitle.textContent).toBe("NYC Hotels by NTA");
+    expect(chartTitle.textContent).toBe("Hotels by NTA");
     fireEvent.click(toggleButtons[1]);
-    expect(chartTitle.textContent).toBe("NYC Hotels by POSTCODE");
+    expect(chartTitle.textContent).toBe("Hotels by POSTCODE");
   });
 
   // test only passes if printing to console log and doing assertions there.

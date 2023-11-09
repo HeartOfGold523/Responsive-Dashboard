@@ -1,12 +1,18 @@
 import React from "react";
 import { Box, Stack } from "@mui/material";
 
-import { HotelsBarChart, HotelsDataTable, HotelsPieChart } from "@/components";
+import {
+  HotelsBarChart,
+  HotelsDataTable,
+  HotelsPieChart,
+  HotelsToolbar,
+} from "@/components";
 
 const Home = (): JSX.Element => {
   return (
     <main>
       <Stack spacing={2} sx={styles.stack}>
+        <HotelsToolbar />
         <Box sx={styles.box}>
           <HotelsPieChart />
           <HotelsBarChart />

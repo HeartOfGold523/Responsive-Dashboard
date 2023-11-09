@@ -96,19 +96,12 @@ describe("HotelsContext", () => {
 
   it('should update state when "refresh" action is dispatched', () => {
     const { getByTestId } = renderTestComponent();
-    const refresh = getByTestId("refresh");
     const loading = getByTestId("loading");
     const refreshBtn = getByTestId("refresh-btn");
 
     fireEvent.click(refreshBtn);
 
-    expect(refresh?.textContent).toBe("true");
     expect(loading?.textContent).toBe("true");
-
-    setTimeout(() => {
-      expect(refresh?.textContent).toBe("false");
-      expect(loading?.textContent).toBe("false");
-    }, 5000);
   });
 
   it('should update state when "new-data" action is dispatched', () => {

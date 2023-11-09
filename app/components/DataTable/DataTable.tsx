@@ -2,6 +2,7 @@
 import React, { Fragment, useMemo, useState } from "react";
 import {
   Box,
+  CircularProgress,
   Collapse,
   IconButton,
   Paper,
@@ -27,6 +28,7 @@ import { getComparator, stableSort } from "@/utils";
 
 type DataTableProps<T> = {
   tableTitle: string;
+  loading: boolean;
   columns: Array<DataTableColumn<T>>;
   data: Array<T>;
   rowId: keyof T;
@@ -43,6 +45,7 @@ type DataTableProps<T> = {
 
 const DataTable = <T,>({
   tableTitle,
+  loading,
   columns,
   data,
   rowId,
@@ -148,6 +151,11 @@ const DataTable = <T,>({
           handleApplyFilter={dispatchFilter}
           contextSearchKeyValue={contextSearchKeyValue}
         />
+        {loading && (
+          <Box sx={styles.progressContainer}>
+            <CircularProgress size={20} sx={styles.progress} />
+          </Box>
+        )}
         <TableContainer>
           <Table
             size={dense ? "small" : "medium"}
@@ -294,6 +302,14 @@ const styles = {
     p: 0,
   },
   collapsibleCellOpened: {},
+  progressContainer: {
+    display: "flex",
+    justifyContent: "center",
+    my: "15px",
+  },
+  progress: {
+    m: "10px",
+  },
 };
 
 export default DataTable;

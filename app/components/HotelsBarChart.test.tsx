@@ -50,7 +50,7 @@ describe("HotelsPieChart", () => {
     const { getByTestId } = renderHotelsBarChart();
     const chartTitle = getByTestId("hotels-bar-chart-title");
     expect(chartTitle).toBeDefined();
-    expect(chartTitle.textContent).toBe("NYC Hotels by COMMUNITY BOARD");
+    expect(chartTitle.textContent).toBe("Hotels by COMMUNITY BOARD");
   });
 
   it("toggles between different chart types", () => {
@@ -69,8 +69,8 @@ describe("HotelsPieChart", () => {
     const chartToggleGroup = getByTestId("hotels-bar-chart-toggle-group");
     const toggleButtons = chartToggleGroup.querySelectorAll("button");
 
-    expect(chartTitle.textContent).toBe("NYC Hotels by COMMUNITY BOARD");
+    expect(chartTitle.textContent).toBe("Hotels by COMMUNITY BOARD");
     fireEvent.click(toggleButtons[1]);
-    expect(chartTitle.textContent).toBe("NYC Hotels by BUILDING CLASS");
+    expect(chartTitle.textContent).toBe("Hotels by BUILDING CLASS");
   });
 });

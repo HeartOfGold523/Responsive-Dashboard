@@ -166,12 +166,7 @@ const DataTableToolbar = <T,>({
 
   return (
     <Toolbar sx={styles.toolbar}>
-      <Typography
-        id="data-table-title"
-        variant="h6"
-        component="div"
-        sx={styles.toolbarTitle}
-      >
+      <Typography id="data-table-title" variant="h6" sx={styles.toolbarTitle}>
         {tableTitle}
       </Typography>
       {filterable && (

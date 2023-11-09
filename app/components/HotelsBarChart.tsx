@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import {
   Box,
+  CircularProgress,
   Paper,
   ToggleButton,
   ToggleButtonGroup,
@@ -64,7 +65,7 @@ const HotelsBarChart = (): JSX.Element => {
           variant="h6"
           sx={styles.toolbarTitle}
         >
-          {`NYC Hotels by ${chartKeys[chartType].label}`}
+          {`Hotels by ${chartKeys[chartType].label}`}
         </Typography>
         <ToggleButtonGroup
           data-testid={"hotels-bar-chart-toggle-group"}
@@ -85,6 +86,11 @@ const HotelsBarChart = (): JSX.Element => {
           ))}
         </ToggleButtonGroup>
       </Toolbar>
+      {loading && (
+        <Box sx={styles.progressContainer}>
+          <CircularProgress size={20} sx={styles.progress} />
+        </Box>
+      )}
       <DataChart
         testId={"hotels-bar-chart-data-chart"}
         chartType={"bar"}
@@ -120,6 +126,14 @@ const styles = {
   },
   toolbarTitle: {
     flex: "1 1 100%",
+  },
+  progressContainer: {
+    display: "flex",
+    justifyContent: "center",
+    my: "15px",
+  },
+  progress: {
+    m: "10px",
   },
 };
 

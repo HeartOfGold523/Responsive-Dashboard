@@ -6,3 +6,4 @@ export { default as DataChart } from "./DataChart";
 export { default as HotelsBarChart } from "./HotelsBarChart";
 export { default as HotelsDataTable } from "./HotelsDataTable";
 export { default as HotelsPieChart } from "./HotelsPieChart";
+export { default as HotelsToolbar } from "./HotelsToolbar";

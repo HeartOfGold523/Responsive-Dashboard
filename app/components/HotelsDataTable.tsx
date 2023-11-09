@@ -87,14 +87,15 @@ const HotelsDataTable = (): JSX.Element => {
 
   const tableTitle =
     searchedValue === ""
-      ? "NYC Hotels"
-      : `NYC Hotels filtered by ${String(searchedKey).toLocaleUpperCase()}`;
+      ? "Hotels"
+      : `Hotels filtered by ${String(searchedKey).toLocaleUpperCase()}`;
 
   const columns = getColumns();
 
   return (
     <DataTable
       tableTitle={tableTitle}
+      loading={loading}
       data={data}
       columns={columns}
       rowId={"parid"}
