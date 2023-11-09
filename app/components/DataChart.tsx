@@ -9,21 +9,13 @@ import {
   ScatterChart,
 } from "@mui/x-charts";
 
-import {
-  MakeOptional,
-  BarChartProps,
-  LineChartProps,
-  ScatterChartProps,
-  PieChartProps,
-} from "@/types";
+import { MakeOptional, DataChartProps } from "@/types";
 
-type DataChartProps =
-  | BarChartProps
-  | LineChartProps
-  | ScatterChartProps
-  | PieChartProps;
-
-const DataChart = ({ chartType, chartParams }: DataChartProps): JSX.Element => {
+const DataChart = ({
+  testId,
+  chartType,
+  chartParams,
+}: DataChartProps): JSX.Element => {
   const getAreaChartSeries = () => {
     return chartParams.series.map((series) => ({
       ...series,
@@ -32,7 +24,7 @@ const DataChart = ({ chartType, chartParams }: DataChartProps): JSX.Element => {
   };
 
   return (
-    <Stack spacing={1} sx={styles.stack}>
+    <Stack data-testid={testId} spacing={1} sx={styles.stack}>
       <Box sx={styles.box}>
         {chartType === "bar" && <BarChart {...chartParams} />}
         {(chartType === "line" || chartType === "area") && (

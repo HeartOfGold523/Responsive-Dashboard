@@ -5,7 +5,6 @@ import { Hotel } from "@/types";
 
 type Action =
   | { type: "refresh" }
-  | { type: "stop-refresh" }
   | {
       type: "new-data";
       payload: { collection: Hotel[]; error: boolean };
@@ -56,15 +55,14 @@ const hotelsContextReducer = (
     case "refresh": {
       return { ...state, refresh: true, loading: true };
     }
-    case "stop-refresh": {
-      return { ...state, refresh: false, loading: false };
-    }
     case "new-data": {
       const { collection, error } = action.payload;
       return {
         ...state,
         originalData: collection,
         data: collection,
+        refresh: false,
+        loading: false,
         error: error,
       };
     }
@@ -122,8 +120,8 @@ const HotelsContextProvider = ({
 
   useEffect(() => {
     if (state.refresh) {
+      dispatch({ type: "refresh" });
       refreshCollection();
-      dispatch({ type: "stop-refresh" });
     }
   }, [state.refresh, refreshCollection]);
 

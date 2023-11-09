@@ -64,3 +64,10 @@ export type PieChartProps = {
     >[];
   };
 };
+
+export type DataChartProps = (
+  | BarChartProps
+  | LineChartProps
+  | ScatterChartProps
+  | PieChartProps
+) & { testId: string };

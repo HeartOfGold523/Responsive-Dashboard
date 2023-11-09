@@ -25,7 +25,8 @@
       "@/contexts": ["./app/contexts/index.ts"],
       "@/types": ["./app/types/index.ts"],
       "@/utils": ["./app/utils/index.ts"]
-    }
+    },
+    "types": ["node", "jest", "@testing-library/react"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]

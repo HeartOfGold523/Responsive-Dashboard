@@ -57,12 +57,17 @@ const HotelsPieChart = (): JSX.Element => {
   const reducedData = chartKeys.map((item) => reduceHotels(item.key));
 
   return (
-    <Box component={Paper} sx={styles.box}>
+    <Box data-testid={"hotels-pie-chart"} component={Paper} sx={styles.box}>
       <Toolbar disableGutters sx={styles.toolbar}>
-        <Typography variant="h6" sx={styles.toolbarTitle}>
+        <Typography
+          data-testid={"hotels-pie-chart-title"}
+          variant="h6"
+          sx={styles.toolbarTitle}
+        >
           {`NYC Hotels by ${chartKeys[chartType].label}`}
         </Typography>
         <ToggleButtonGroup
+          data-testid={"hotels-pie-chart-toggle-group"}
           value={chartType}
           exclusive
           onChange={handleChangeChartType}
@@ -70,6 +75,7 @@ const HotelsPieChart = (): JSX.Element => {
         >
           {chartKeys.map((item, index) => (
             <ToggleButton
+              data-testid={`hotels-pie-chart-toggle-button-${index}`}
               key={String(item.key) + index}
               value={index}
               aria-label={item.label}
@@ -80,6 +86,7 @@ const HotelsPieChart = (): JSX.Element => {
         </ToggleButtonGroup>
       </Toolbar>
       <DataChart
+        testId={"hotels-pie-chart-data-chart"}
         chartType={"pie"}
         chartParams={{
           height: 500,

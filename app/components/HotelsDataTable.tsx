@@ -99,7 +99,7 @@ const HotelsDataTable = (): JSX.Element => {
       columns={columns}
       rowId={"parid"}
       rowsPerPageOptions={[5, 10, 25]}
-      defaultOrderBy={"borocode"}
+      defaultOrderBy={"parid"}
       collapsible
       filterable
       dispatchFilter={dispatchFilter}

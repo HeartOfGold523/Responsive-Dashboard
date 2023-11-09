@@ -57,12 +57,17 @@ const HotelsBarChart = (): JSX.Element => {
   const reducedData = chartKeys.map((item) => reduceHotels(item.key));
 
   return (
-    <Box component={Paper} sx={styles.box}>
+    <Box data-testid={"hotels-bar-chart"} component={Paper} sx={styles.box}>
       <Toolbar disableGutters sx={styles.toolbar}>
-        <Typography variant="h6" sx={styles.toolbarTitle}>
+        <Typography
+          data-testid={"hotels-bar-chart-title"}
+          variant="h6"
+          sx={styles.toolbarTitle}
+        >
           {`NYC Hotels by ${chartKeys[chartType].label}`}
         </Typography>
         <ToggleButtonGroup
+          data-testid={"hotels-bar-chart-toggle-group"}
           value={chartType}
           exclusive
           onChange={handleChangeChartType}
@@ -70,6 +75,7 @@ const HotelsBarChart = (): JSX.Element => {
         >
           {chartKeys.map((item, index) => (
             <ToggleButton
+              data-testid={`hotels-bar-chart-toggle-button-${index}`}
               key={String(item.key) + index}
               value={index}
               aria-label={item.label}
@@ -80,6 +86,7 @@ const HotelsBarChart = (): JSX.Element => {
         </ToggleButtonGroup>
       </Toolbar>
       <DataChart
+        testId={"hotels-bar-chart-data-chart"}
         chartType={"bar"}
         chartParams={{
           height: 500,
