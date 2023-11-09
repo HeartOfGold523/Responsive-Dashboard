@@ -2,6 +2,7 @@ import {
   AxisConfig,
   BarSeriesType,
   CardinalDirections,
+  ChartsColorPalette,
   DefaultizedPieValueType,
   LineSeriesType,
   PieItemIdentifier,
@@ -51,6 +52,7 @@ export type PieChartProps = {
   chartType: "pie";
   chartParams: {
     height: number;
+    colors?: ChartsColorPalette;
     margin?: CardinalDirections<number>;
     slotProps?: object;
     onClick?: (

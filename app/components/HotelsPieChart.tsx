@@ -68,76 +68,110 @@ const HotelsPieChart = (): JSX.Element => {
         >
           {`Hotels by ${chartKeys[chartType].label}`}
         </Typography>
-        <ToggleButtonGroup
-          data-testid={"hotels-pie-chart-toggle-group"}
-          value={chartType}
-          exclusive
-          onChange={handleChangeChartType}
-          aria-label="NYC Hotels Pie Chart"
-        >
-          {chartKeys.map((item, index) => (
-            <ToggleButton
-              data-testid={`hotels-pie-chart-toggle-button-${index}`}
-              key={String(item.key) + index}
-              value={index}
-              aria-label={item.label}
-            >
-              {item.label}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        {!error && (
+          <ToggleButtonGroup
+            data-testid={"hotels-pie-chart-toggle-group"}
+            value={chartType}
+            exclusive
+            onChange={handleChangeChartType}
+            aria-label="NYC Hotels Pie Chart"
+          >
+            {chartKeys.map((item, index) => (
+              <ToggleButton
+                data-testid={`hotels-pie-chart-toggle-button-${index}`}
+                key={String(item.key) + index}
+                value={index}
+                aria-label={item.label}
+              >
+                {item.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        )}
       </Toolbar>
       {loading && (
         <Box sx={styles.progressContainer}>
           <CircularProgress size={20} sx={styles.progress} />
         </Box>
       )}
-      <DataChart
-        testId={"hotels-pie-chart-data-chart"}
-        chartType={"pie"}
-        chartParams={{
-          height: 500,
-          margin: {
-            top: 0,
-            right: 10,
-            bottom: 200,
-            left: 10,
-          },
-          slotProps: {
-            legend: {
-              direction: "row",
-              position: { vertical: "bottom", horizontal: "middle" },
-              padding: 0,
+      {error ? (
+        <Box sx={styles.progressContainer}>
+          <Typography>An error occurred</Typography>
+        </Box>
+      ) : (
+        <DataChart
+          testId={"hotels-pie-chart-data-chart"}
+          chartType={"pie"}
+          chartParams={{
+            height: 500,
+            colors: [
+              "#708090",
+              "#C32148",
+              "#191970",
+              "#006400",
+              "#9acd32",
+              "#ff0000",
+              "#ff8c00",
+              "#ffd700",
+              "#40e0d0",
+              "#00ff00",
+              "#ba55d3",
+              "#00fa9a",
+              "#0000ff",
+              "#ff00ff",
+              "#1e90ff",
+              "#fa8072",
+              "#dda0dd",
+              "#ff1493",
+              "#87cefa",
+              "#ffdead",
+            ],
+            margin: {
+              top: 0,
+              right: 10,
+              bottom: 200,
+              left: 10,
             },
-          },
-          onClick: (e, itemIdentifier, item) => {
-            // clear filter before attempting to filter again
-            dispatch({
-              type: "filter-data",
-              payload: {
-                property: undefined,
-                searchedValue: "",
+            slotProps: {
+              legend: {
+                direction: "row",
+                position: { vertical: "bottom", horizontal: "middle" },
+                padding: 0,
               },
-            });
-            dispatch({
-              type: "filter-data",
-              payload: {
-                property: chartKeys[chartType].key,
-                searchedValue: item.label!,
-              },
-            });
-          },
-          series: [
-            {
-              data: reducedData[chartType],
-              paddingAngle: 1,
-              cornerRadius: 5,
-              highlightScope: { faded: "global", highlighted: "item" },
-              faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
             },
-          ],
-        }}
-      />
+            onClick: (e, itemIdentifier, item) => {
+              // clear filter before attempting to filter again
+              dispatch({
+                type: "filter-data",
+                payload: {
+                  property: undefined,
+                  searchedValue: "",
+                },
+              });
+              dispatch({
+                type: "filter-data",
+                payload: {
+                  property: chartKeys[chartType].key,
+                  searchedValue: item.label!,
+                },
+              });
+            },
+            series: [
+              {
+                data: reducedData[chartType],
+                paddingAngle: 1,
+                cornerRadius: 5,
+                highlightScope: { faded: "global", highlighted: "item" },
+                faded: {
+                  innerRadius: 30,
+                  additionalRadius: -30,
+                  color: "gray",
+                },
+              },
+            ],
+          }}
+        />
+      )}
     </Box>
   );
 };
@@ -150,6 +184,9 @@ const styles = {
   },
   toolbar: {
     gap: 1,
+    flexDirection: { xs: "column", md: "row" },
+    mb: { xs: 2, md: 0 },
+    textAlign: { xs: "center", md: "left" },
   },
   toolbarTitle: {
     flex: "1 1 100%",

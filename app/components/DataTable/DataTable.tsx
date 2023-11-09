@@ -12,6 +12,7 @@ import {
   TableContainer,
   TableRow,
   Tooltip,
+  Typography,
 } from "@mui/material";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
@@ -28,10 +29,11 @@ import { getComparator, stableSort } from "@/utils";
 
 type DataTableProps<T> = {
   tableTitle: string;
-  loading: boolean;
+  loading?: boolean;
+  error?: boolean;
   columns: Array<DataTableColumn<T>>;
   data: Array<T>;
-  rowId: keyof T;
+  rowId: Array<keyof T>;
   rowsPerPageOptions: DataTableRowsOptions[];
   defaultOrderBy?: keyof T;
   collapsible?: boolean;
@@ -46,6 +48,7 @@ type DataTableProps<T> = {
 const DataTable = <T,>({
   tableTitle,
   loading,
+  error,
   columns,
   data,
   rowId,
@@ -143,141 +146,150 @@ const DataTable = <T,>({
 
   return (
     <Box component={Paper} sx={styles.box}>
-      <Paper sx={styles.paper}>
-        <DataTableToolbar
-          tableTitle={tableTitle}
-          columns={controlledColumns}
-          filterable={filterable}
-          handleApplyFilter={dispatchFilter}
-          contextSearchKeyValue={contextSearchKeyValue}
-        />
-        {loading && (
-          <Box sx={styles.progressContainer}>
-            <CircularProgress size={20} sx={styles.progress} />
-          </Box>
-        )}
-        <TableContainer>
-          <Table
-            size={dense ? "small" : "medium"}
-            aria-labelledby="data-table-title"
-          >
-            <DataTableHead
+      {loading && (
+        <Box sx={styles.progressContainer}>
+          <CircularProgress size={20} sx={styles.progress} />
+        </Box>
+      )}
+      {error ? (
+        <Box sx={styles.errorContainer}>
+          <Typography>An error occurred</Typography>
+        </Box>
+      ) : (
+        <>
+          <Paper sx={styles.paper}>
+            <DataTableToolbar
+              tableTitle={tableTitle}
               columns={controlledColumns}
-              onRequestSort={handleRequestSort}
-              order={order}
-              orderBy={orderBy}
-              collapsible={collapsible}
+              filterable={filterable}
+              handleApplyFilter={dispatchFilter}
+              contextSearchKeyValue={contextSearchKeyValue}
             />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const isItemOpened = isOpened(String(row[rowId]));
+            <TableContainer>
+              <Table
+                size={dense ? "small" : "medium"}
+                aria-labelledby="data-table-title"
+              >
+                <DataTableHead
+                  columns={controlledColumns}
+                  onRequestSort={handleRequestSort}
+                  order={order}
+                  orderBy={orderBy}
+                  collapsible={collapsible}
+                />
+                <TableBody>
+                  {visibleRows.map((row, index) => {
+                    const constructedId = rowId
+                      .map((key) => String(row[key]))
+                      .join("-");
+                    const isItemOpened = isOpened(constructedId);
 
-                return (
-                  <Fragment key={`row-${String(rowId)}-${index}`}>
-                    <TableRow
-                      hover
-                      onClick={
-                        collapsible
-                          ? (event) => handleClick(event, String(row[rowId]))
-                          : undefined
-                      }
-                      tabIndex={-1}
-                      sx={styles.tableRow}
-                    >
-                      {collapsible && (
-                        <TableCell padding="checkbox">
-                          <IconButton aria-label="expand row" size="small">
-                            {isItemOpened ? (
-                              <KeyboardArrowUp />
-                            ) : (
-                              <KeyboardArrowDown />
-                            )}
-                          </IconButton>
-                        </TableCell>
-                      )}
-                      {controlledColumns.map((col, colIndex) => (
-                        <Tooltip
-                          key={`cell-${String(rowId)}-${index}-${colIndex}`}
-                          title={String(row[col.id])}
-                        >
-                          <TableCell
-                            align={col.align}
-                            component={colIndex === 0 ? "th" : undefined}
-                            scope={colIndex === 0 ? "row" : undefined}
-                            sx={{
-                              ...styles.tableCell,
-                              ...(col.disabledPadding && { p: 0 }),
-                              ...(col.maxWidth && {
-                                maxWidth: `${col.maxWidth}px`,
-                              }),
-                            }}
-                          >
-                            {row[col.id] as React.ReactNode}
-                          </TableCell>
-                        </Tooltip>
-                      ))}
-                    </TableRow>
-                    {collapsible && (
-                      <TableRow>
-                        <TableCell
-                          colSpan={controlledColumns.length + 1}
-                          sx={
-                            isItemOpened
-                              ? styles.collapsibleCellOpened
-                              : styles.collapsibleCellClosed
+                    return (
+                      <Fragment key={`row-${constructedId}-${index}`}>
+                        <TableRow
+                          hover
+                          onClick={
+                            collapsible
+                              ? (event) => handleClick(event, constructedId)
+                              : undefined
                           }
+                          tabIndex={-1}
+                          sx={styles.tableRow}
                         >
-                          <Collapse
-                            in={isItemOpened}
-                            timeout="auto"
-                            unmountOnExit
-                          >
-                            {controlledColumns.map((col, colIndex) => (
-                              <Box
-                                key={`collapse-${String(
-                                  rowId
-                                )}-${index}-${colIndex}`}
+                          {collapsible && (
+                            <TableCell padding="checkbox">
+                              <IconButton aria-label="expand row" size="small">
+                                {isItemOpened ? (
+                                  <KeyboardArrowUp />
+                                ) : (
+                                  <KeyboardArrowDown />
+                                )}
+                              </IconButton>
+                            </TableCell>
+                          )}
+                          {controlledColumns.map((col, colIndex) => (
+                            <Tooltip
+                              key={`cell-${constructedId}-${index}-${colIndex}`}
+                              title={String(row[col.id])}
+                            >
+                              <TableCell
+                                align={col.align}
+                                component={colIndex === 0 ? "th" : undefined}
+                                scope={colIndex === 0 ? "row" : undefined}
+                                sx={{
+                                  ...styles.tableCell,
+                                  ...(col.disabledPadding && { p: 0 }),
+                                  ...(col.maxWidth && {
+                                    maxWidth: `${col.maxWidth}px`,
+                                  }),
+                                }}
                               >
-                                {col.label}: &ensp;{" "}
                                 {row[col.id] as React.ReactNode}
-                              </Box>
-                            ))}
-                          </Collapse>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </Fragment>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: dense ? 33 : 53 * emptyRows,
-                  }}
-                >
-                  <TableCell
-                    colSpan={
-                      collapsible
-                        ? controlledColumns.length + 1
-                        : controlledColumns.length
-                    }
-                  />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Paper>
-      <DataTableControls
-        rowsPerPageOptions={rowsPerPageOptions}
-        count={data.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        dense={dense}
-        onChangeDense={handleChangeDense}
-      />
+                              </TableCell>
+                            </Tooltip>
+                          ))}
+                        </TableRow>
+                        {collapsible && (
+                          <TableRow>
+                            <TableCell
+                              colSpan={controlledColumns.length + 1}
+                              sx={
+                                isItemOpened
+                                  ? styles.collapsibleCellOpened
+                                  : styles.collapsibleCellClosed
+                              }
+                            >
+                              <Collapse
+                                in={isItemOpened}
+                                timeout="auto"
+                                unmountOnExit
+                              >
+                                {controlledColumns.map((col, colIndex) => (
+                                  <Box
+                                    key={`collapse-${constructedId}-${index}-${colIndex}`}
+                                  >
+                                    {col.label}: &ensp;{" "}
+                                    {row[col.id] as React.ReactNode}
+                                  </Box>
+                                ))}
+                              </Collapse>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </Fragment>
+                    );
+                  })}
+                  {emptyRows > 0 && (
+                    <TableRow
+                      style={{
+                        height: dense ? 33 : 53 * emptyRows,
+                      }}
+                    >
+                      <TableCell
+                        colSpan={
+                          collapsible
+                            ? controlledColumns.length + 1
+                            : controlledColumns.length
+                        }
+                      />
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
+          <DataTableControls
+            rowsPerPageOptions={rowsPerPageOptions}
+            count={data.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            dense={dense}
+            onChangeDense={handleChangeDense}
+          />
+        </>
+      )}
     </Box>
   );
 };
@@ -309,6 +321,11 @@ const styles = {
   },
   progress: {
     m: "10px",
+  },
+  errorContainer: {
+    display: "flex",
+    justifyContent: "center",
+    py: "15px",
   },
 };
 

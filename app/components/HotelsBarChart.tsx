@@ -67,50 +67,58 @@ const HotelsBarChart = (): JSX.Element => {
         >
           {`Hotels by ${chartKeys[chartType].label}`}
         </Typography>
-        <ToggleButtonGroup
-          data-testid={"hotels-bar-chart-toggle-group"}
-          value={chartType}
-          exclusive
-          onChange={handleChangeChartType}
-          aria-label="NYC Hotels Pie Chart"
-        >
-          {chartKeys.map((item, index) => (
-            <ToggleButton
-              data-testid={`hotels-bar-chart-toggle-button-${index}`}
-              key={String(item.key) + index}
-              value={index}
-              aria-label={item.label}
-            >
-              {item.label}
-            </ToggleButton>
-          ))}
-        </ToggleButtonGroup>
+        {!error && (
+          <ToggleButtonGroup
+            data-testid={"hotels-bar-chart-toggle-group"}
+            value={chartType}
+            exclusive
+            onChange={handleChangeChartType}
+            aria-label="NYC Hotels Pie Chart"
+          >
+            {chartKeys.map((item, index) => (
+              <ToggleButton
+                data-testid={`hotels-bar-chart-toggle-button-${index}`}
+                key={String(item.key) + index}
+                value={index}
+                aria-label={item.label}
+              >
+                {item.label}
+              </ToggleButton>
+            ))}
+          </ToggleButtonGroup>
+        )}
       </Toolbar>
       {loading && (
         <Box sx={styles.progressContainer}>
           <CircularProgress size={20} sx={styles.progress} />
         </Box>
       )}
-      <DataChart
-        testId={"hotels-bar-chart-data-chart"}
-        chartType={"bar"}
-        chartParams={{
-          height: 500,
-          xAxis: [
-            {
-              scaleType: "band",
-              data: reducedData[chartType].map((data) => data.label),
-            },
-          ],
-          series: [
-            {
-              data: reducedData[chartType].map((data) => data.value),
-              label: chartKeys[chartType].label,
-              highlightScope: { faded: "global", highlighted: "item" },
-            },
-          ],
-        }}
-      />
+      {error ? (
+        <Box sx={styles.progressContainer}>
+          <Typography>An error occurred</Typography>
+        </Box>
+      ) : (
+        <DataChart
+          testId={"hotels-bar-chart-data-chart"}
+          chartType={"bar"}
+          chartParams={{
+            height: 500,
+            xAxis: [
+              {
+                scaleType: "band",
+                data: reducedData[chartType].map((data) => data.label),
+              },
+            ],
+            series: [
+              {
+                data: reducedData[chartType].map((data) => data.value),
+                label: chartKeys[chartType].label,
+                highlightScope: { faded: "global", highlighted: "item" },
+              },
+            ],
+          }}
+        />
+      )}
     </Box>
   );
 };
@@ -123,6 +131,9 @@ const styles = {
   },
   toolbar: {
     gap: 1,
+    flexDirection: { xs: "column", md: "row" },
+    mb: { xs: 2, md: 0 },
+    textAlign: { xs: "center", md: "left" },
   },
   toolbarTitle: {
     flex: "1 1 100%",

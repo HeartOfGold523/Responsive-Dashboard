@@ -96,9 +96,10 @@ const HotelsDataTable = (): JSX.Element => {
     <DataTable
       tableTitle={tableTitle}
       loading={loading}
+      error={error}
       data={data}
       columns={columns}
-      rowId={"parid"}
+      rowId={["parid", "taxyear"]}
       rowsPerPageOptions={[5, 10, 25]}
       defaultOrderBy={"parid"}
       collapsible
