@@ -13,7 +13,7 @@ The live app can be found [here](https://responsive-dashboard-zeta.vercel.app/)
 
 ## What I'm proud of
 
-- Fetching, refetching, and handling errors from a server component and exposing them to a global context for client components to consume
+- Fetching, refetching, and handling errors from a server component and exposing them to a global context for client components to consume.
 - Generalized and reusable `DataTable` component (and sub-components) which can accept and render data from any type in a table, not just the `Hotel` type relevant to this project.
 - Reusable `DataChart` component to render area graphs, line graphs, bar graphs, pie charts, or scatter plots.
 - Module aliases for cleaner imports, including for Jest.
@@ -22,7 +22,8 @@ The live app can be found [here](https://responsive-dashboard-zeta.vercel.app/)
 ## If I had more time
 
 - Finish writing unit tests for other components/pages.
-- Move the endpoint I'm calling into an environment variable.
+- Move the API endpoint I'm calling into an environment variable.
+- Look into different charts library or attempt to create my own with MUI to allow clickable/filterable bar graph. MUI pre-built charts are nice, but only the PieChart allows for onClick handlers.
 - Create constants folder/module alias:
   - Create `strings.ts` file for defining all of the text used across the app. This would be used for localization.
   - Create `colors.ts` file for defining all of the colors used across the app. This could be referenced either directly or from a `ThemeProvider` like MUI has.
