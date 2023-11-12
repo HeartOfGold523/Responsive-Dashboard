@@ -64,6 +64,8 @@ const hotelsContextReducer = (
         ...state,
         originalData: collection,
         data: collection,
+        searchedKey: "parid",
+        searchedValue: "",
         loading: false,
         error: error,
       };
